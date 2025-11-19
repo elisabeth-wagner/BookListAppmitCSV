@@ -1,0 +1,46 @@
+﻿@page "/favorites"
+@using BookListApp.Models
+@inject ControllerService FavoriteService
+
+<h3>Favoriten</h3>
+
+@if (!FavoriteService.Favorites.Any())
+{
+    <p>Keine Favoriten gespeichert.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Titel</th>
+                <th>Autor</th>
+                <th>Jahr</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var book in FavoriteService.Favorites)
+            {
+                <tr>
+                    <td>
+                        <span style="cursor:pointer; color:gold"
+                              @onclick="@(() => Remove(book))">
+                            ★
+                        </span>
+                    </td>
+                    <td>@book.Title</td>
+                    <td>@book.Author</td>
+                    <td>@book.Year</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private void Remove(Book book)
+    {
+        FavoriteService.Remove(book);
+    }
+}

@@ -1,0 +1,97 @@
+﻿@page "/books"
+
+@using BookListApp.Models
+@using BookListApp.Controller
+@using Microsoft.AspNetCore.Components
+@using System.Linq
+
+@inject ControllerService FavoritenService
+@inject BookCsvService CsvService
+
+<h3>Bücherliste</h3>
+
+<div class="mb-3 d-flex align-items-center gap-2">
+    <label>Suche:</label>
+    <input type="text" @bind="searchTerm" placeholder="Buchtitel" class="form-control w-auto" />
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th></th>
+            <th @onclick="@(() => SortByColumn("Title"))" style="cursor:pointer;">Titel @SortIndicator("Title")</th>
+            <th @onclick="@(() => SortByColumn("Author"))" style="cursor:pointer;">Autor @SortIndicator("Author")</th>
+            <th @onclick="@(() => SortByColumn("Year"))" style="cursor:pointer;">Jahr @SortIndicator("Year")</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var book in FilteredBooks)
+        {
+            <tr>
+                <td>
+                    <span style="cursor:pointer; color:@(FavoritenService.IsFavorite(book) ? "gold" : "gray")"
+                          @onclick="@(() => ToggleFavorite(book))">
+                        ★
+                    </span>
+                </td>
+                <td>@book.Title</td>
+                <td>@book.Author</td>
+                <td>@book.Year</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private List<Book> books = new();
+    private string searchTerm = "";
+    private string sortBy = "Title";
+    private bool sortAscending = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        books = await CsvService.LoadBooksAsync();
+    }
+
+    private IEnumerable<Book> FilteredBooks
+    {
+        get
+        {
+            var filtered = books.Where(b =>
+                string.IsNullOrWhiteSpace(searchTerm) ||
+                b.Title.Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
+
+            switch (sortBy)
+            {
+                case "Title": filtered = sortAscending ? filtered.OrderBy(b => b.Title) : filtered.OrderByDescending(b => b.Title); break;
+                case "Author": filtered = sortAscending ? filtered.OrderBy(b => b.Author) : filtered.OrderByDescending(b => b.Author); break;
+                case "Year": filtered = sortAscending ? filtered.OrderBy(b => b.Year) : filtered.OrderByDescending(b => b.Year); break;
+            }
+
+            return filtered.ToList();
+        }
+    }
+
+    private void SortByColumn(string column)
+    {
+        if (sortBy == column)
+            sortAscending = !sortAscending;
+        else
+        {
+            sortBy = column;
+            sortAscending = true;
+        }
+    }
+
+    private MarkupString SortIndicator(string column)
+    {
+        if (sortBy != column) return new MarkupString("");
+        return new MarkupString(sortAscending ? " ↑" : " ↓");
+    }
+
+    private void ToggleFavorite(Book book)
+    {
+        FavoritenService.ToggleFavorite(book);
+        StateHasChanged();
+    }
+}
