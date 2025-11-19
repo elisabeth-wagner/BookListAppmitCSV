@@ -17,6 +17,15 @@ BookListApp/
 └── Program.cs
 
 ## ▶️ Starten
+1. Repository klonen:
+```bash
+git clone https://github.com/elisabeth-wagner/BookListAppmitCSV
+````
+2. In den Projektordner wechseln:
+```bash
+cd BookListAppmitCSV/BookListApp
+```
+3. Projekt starten:
 ```bash
 dotnet run
 ```
