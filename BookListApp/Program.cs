@@ -1,5 +1,6 @@
-﻿using BookListApp.Components;
+using BookListApp.Components;
 using BookListApp.Controller;
+using System.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,9 +9,7 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddSingleton<ControllerService>();
-
 builder.Services.AddSingleton<BookCsvService>();
-
 
 var app = builder.Build();
 
@@ -29,5 +28,21 @@ app.UseAntiforgery();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
-app.Run();
+// === Browser automatisch öffnen, nur wenn nicht über Visual Studio ===
+if (!Debugger.IsAttached) 
+{
+    var url = "http://localhost:5010";
+    try
+    {
+        Process.Start(new ProcessStartInfo
+        {
+            FileName = url,
+            UseShellExecute = true
+        });
+    }
+    catch
+    {
+    }
+}
 
+app.Run();
