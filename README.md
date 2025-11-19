@@ -32,8 +32,8 @@ dotnet run
 
 ## 📄 CSV-Format
 ```
-Title;Author;Year
-Der Prozess;Franz Kafka;1925
+Title,Author,Year
+Der Prozess,Franz Kafka,1925
 ```
 
 ## 🧑‍💻 Autor
