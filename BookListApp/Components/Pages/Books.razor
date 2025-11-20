@@ -4,9 +4,10 @@
 @using BookListApp.Controller
 @using Microsoft.AspNetCore.Components
 @using System.Linq
+@rendermode InteractiveServer
 
 @inject ControllerService FavoritenService
-@inject BookCsvService CsvService
+@inject BookSupabaseService SupabaseService
 
 <h3>Bücherliste</h3>
 
@@ -19,9 +20,12 @@
     <thead>
         <tr>
             <th></th>
+            <th @onclick="@(() => SortByColumn("ID"))" style="cursor:pointer;">ID @SortIndicator("ID")</th>
             <th @onclick="@(() => SortByColumn("Title"))" style="cursor:pointer;">Titel @SortIndicator("Title")</th>
             <th @onclick="@(() => SortByColumn("Author"))" style="cursor:pointer;">Autor @SortIndicator("Author")</th>
             <th @onclick="@(() => SortByColumn("Year"))" style="cursor:pointer;">Jahr @SortIndicator("Year")</th>
+            <th @onclick="@(() => SortByColumn("Description"))" style="cursor:pointer;">Description @SortIndicator("Description")</th>
+            <th @onclick="@(() => SortByColumn("Image_Url"))" style="cursor:pointer;">Image_Url @SortIndicator("Image_Url")</th>
         </tr>
     </thead>
     <tbody>
@@ -34,9 +38,12 @@
                         ★
                     </span>
                 </td>
+                <td>@book.ID</td>
                 <td>@book.Title</td>
                 <td>@book.Author</td>
                 <td>@book.Year</td>
+                <td>@book.Description</td>
+                <td>@book.Image_Url</td>
             </tr>
         }
     </tbody>
@@ -50,7 +57,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        books = await CsvService.LoadBooksAsync();
+        books = await SupabaseService.LoadBooksAsync();
     }
 
     private IEnumerable<Book> FilteredBooks
@@ -63,9 +70,12 @@
 
             switch (sortBy)
             {
+                case "ID": filtered = sortAscending ? filtered.OrderBy(b => b.Title) : filtered.OrderByDescending(b => b.Title); break;
                 case "Title": filtered = sortAscending ? filtered.OrderBy(b => b.Title) : filtered.OrderByDescending(b => b.Title); break;
                 case "Author": filtered = sortAscending ? filtered.OrderBy(b => b.Author) : filtered.OrderByDescending(b => b.Author); break;
                 case "Year": filtered = sortAscending ? filtered.OrderBy(b => b.Year) : filtered.OrderByDescending(b => b.Year); break;
+                case "Description": filtered = sortAscending ? filtered.OrderBy(b => b.Description) : filtered.OrderByDescending(b => b.Description); break;
+                case "Image_Url": filtered = sortAscending ? filtered.OrderBy(b => b.Image_Url) : filtered.OrderByDescending(b => b.Image_Url); break;
             }
 
             return filtered.ToList();

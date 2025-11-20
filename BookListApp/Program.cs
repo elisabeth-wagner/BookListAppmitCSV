@@ -9,7 +9,9 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddSingleton<ControllerService>();
-builder.Services.AddSingleton<BookCsvService>();
+// builder.Services.AddSingleton<BookCsvService>();
+builder.Services.AddHttpClient<BookSupabaseService>();
+
 
 var app = builder.Build();
 
